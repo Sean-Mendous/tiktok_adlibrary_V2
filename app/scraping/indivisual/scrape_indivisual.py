@@ -85,7 +85,7 @@ def get_time_htmls(browser, original_html):
 
 def get_htmls(url, cookie):
     try:
-        browser = open_url(url, window_whosh)
+        browser = open_url(url, window_whosh=True)
         if browser: 
             logger.info(f' >Successfully opened {url[:10]}..')
         else:

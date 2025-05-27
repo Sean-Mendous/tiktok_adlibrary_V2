@@ -11,7 +11,7 @@ logger.info("🏃‍♀️🏃‍♀️ Starting main execution 🏃‍♀️�
 search_feild = [
     {
         'url': 'https://ads.tiktok.com/business/creativecenter/inspiration/topads/pc/ja?period=180&region=JP&industry=14&object=3',
-        'condition': 'skincare + CVR + Japan'
+        'condition': 'スキンケア'
     }
 ]
 
@@ -20,8 +20,8 @@ table_name = "V2_format"
 system_num = input("""
 1: list scraping
 2: indivisual scraping
-3: tag scraping
-4: indivisual scraping + tag scraping
+3: video research
+4: indivisual scraping + video research
                    
 Enter the system number.. 
 """)
@@ -50,14 +50,19 @@ elif system_num == 2:
         dict_list = select_from_supabase(table_name, "system_status", "list_scraping")
         supabase = spabase_supabase()
         for dict_dict in dict_list:
-            id = dict_dict["system_id"]
-            url = dict_dict["search_url"]
+            try:
+                id = dict_dict["system_id"]
+                url = dict_dict["search_url"]
 
-            from app.scraping.indivisual.logic_indivisual import run_flow
-            output = run_flow(url)
+                from app.scraping.indivisual.logic_indivisual import run_flow
+                output = run_flow(url)
 
-            supabase.table(table_name).update(output).eq("system_id", id).execute()
-            logger.info(f"Successfully updated: {id}")
+                supabase.table(table_name).update(output).eq("system_id", id).execute()
+                logger.info(f"Successfully updated: {id}")
+            except Exception as e:
+                logger.critical(f"🔴 {e}")
+                traceback.print_exc()
+                sys.exit(2)
     except Exception as e:
         logger.critical(f"🔴 {e}")
         traceback.print_exc()
@@ -69,10 +74,10 @@ elif system_num == 3:
         supabase = spabase_supabase()
         for dict_dict in dict_list:
             id = dict_dict["system_id"]
-            landingpage = dict_dict["about_landingpage"]
+            url = dict_dict["search_url"]
 
-            from app.analysing.tag.logic_tag import run_flow
-            output = run_flow(landingpage)
+            from app.analysing.video.logic import run_flow
+            output = run_flow(url)
 
             supabase.table(table_name).update(output).eq("system_id", id).execute()
             logger.info(f"Successfully updated: {id}")
@@ -89,16 +94,24 @@ elif system_num == 4:
             id = dict_dict["system_id"]
             url = dict_dict["search_url"]
 
-            from app.scraping.indivisual.logic_indivisual import run_flow
-            indivisual_output = run_flow(url)
-            print(indivisual_output)
-            landingpage = indivisual_output["about_landingpage"]
-            from app.analysing.tag.logic_tag import run_flow
-            tag_output = run_flow(landingpage)
+            try:
+                from app.scraping.indivisual.logic_indivisual import run_flow
+                indivisual_output = run_flow(url)
+                supabase.table(table_name).update(indivisual_output).eq("system_id", id).execute()
+                logger.info(f"Successfully updated - indivisual: {id}")
+            except Exception as e:
+                logger.critical(f"🔴 {e}")
+                continue
 
-            output = indivisual_output | tag_output
-            supabase.table(table_name).update(output).eq("system_id", id).execute()
-            logger.info(f"Successfully updated: {id}")
+            try:
+                from app.analysing.video.logic import run_flow
+                video_output = run_flow(url)
+                supabase.table(table_name).update(video_output).eq("system_id", id).execute()
+                logger.info(f"Successfully updated - video: {id}")
+            except Exception as e:
+                logger.critical(f"🔴 {e}")
+                continue
+            
     except Exception as e:
         logger.critical(f"🔴 {e}")
         traceback.print_exc()

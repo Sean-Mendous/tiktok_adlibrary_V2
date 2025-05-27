@@ -29,12 +29,31 @@ def run_flow(url, cookie_path=cookie_path):
     except Exception as e:
         raise RuntimeError(f'Failed to extract data: {e}') from e
     
-    def convert_to_dict(output_data):
-        overall = output_data | {"system_status": "indivisual_scraping"}
-        return overall
+    def convert_keys(output_data):
+        converted_data = {}
+        
+        converted_data["scraping_brand"] = output_data["about_brand"]
+        converted_data["scraping_industry"] = output_data["about_industry"]
+        converted_data["scraping_caption"] = output_data["about_caption"]
+        converted_data["scraping_landingpage"] = output_data["about_landingpage"]
+
+        converted_data["scraping_likes"] = output_data["data_likes"]
+        converted_data["scraping_comments"] = output_data["data_comments"]
+        converted_data["scraping_shares"] = output_data["data_shares"]
+        converted_data["scraping_ctr"] = output_data["data_ctr"]
+        converted_data["scraping_budget"] = output_data["data_budget"]
+
+        converted_data["scraping_ctr_top"] = output_data["time_ctr_top"]
+        converted_data["scraping_ctr_sec"] = output_data["time_ctr_sec"]
+        converted_data["scraping_cvr_top"] = output_data["time_cvr_top"]
+        converted_data["scraping_cvr_sec"] = output_data["time_cvr_sec"]
+
+        converted_data["system_status"] = "indivisual_scraping"
+
+        return converted_data
     
     try:
-        converted_data = convert_to_dict(output_data)
+        converted_data = convert_keys(output_data)
         logger.info(f'Successfully converted data')
     except Exception as e:
         raise RuntimeError(f'Failed to convert data: {e}') from e
