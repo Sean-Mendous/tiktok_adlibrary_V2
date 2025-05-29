@@ -41,11 +41,13 @@ def chatgpt_4o_image_model(encoded_image, prompt, client=client):
 
 
 if __name__ == "__main__":
-    prompt = """
-このサイトについて詳細に教えて。
+    with open("app/api/persona/prompt.md", "r") as f:
+        prompt = f.read()
 
-サイト：
-https://sb-blm.discover-news.tokyo/ab/eLfux-HDTNsPTiYCsuhw?utm_creative=002_tiktok_001__013_004&utm_source=tiktok&utm_medium=paid&utm_id=__CAMPAIGN_ID__&utm_campaign=__CAMPAIGN_NAME__
-"""
+    print(prompt)
     print(chatgpt_4omini(prompt))
+
+"""
+python -m app.llm.chatgpt_setting
+"""
 

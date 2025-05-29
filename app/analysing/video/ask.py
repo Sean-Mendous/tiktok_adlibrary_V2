@@ -1,5 +1,5 @@
 import base64
-from app.analysing.gemini_setting import gemini_20_flash_with_video, upload_video
+from app.llm.gemini_setting import gemini_20_flash_with_video, upload_video
 from utilities.logger import logger
 
 prompt_path = "app/analysing/video/prompt/video_analyse_gemini.md"
@@ -55,11 +55,11 @@ def ask(video_path, prompt_path=prompt_path):
     return response
 
 if __name__ == "__main__":
-    response = ask_content_idea("app/analysing/video/temp_output/7479428489223077906.mp4")
+    response = ask("app/analysing/video/temp_output/7479428489223077906.mp4")
     print(response)
 
 
 """
-python -m app.analysing.video.ask_content_idea
+python -m app.analysing.video.ask
 """
 

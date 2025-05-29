@@ -1,4 +1,5 @@
 ## Python File Structure
+
 - Project-Root/
     - logs/
     - clients/
@@ -28,4 +29,13 @@
             - video
         - db/
             - supabase_setting.py
+        - llm/
+            - chatgpt_setting.py
+            - gemini_setting.py
+            - alpha_setting.py
+        - api/
+            - persona/
+                - prompt.md
+                - main.py
+
     - main.py

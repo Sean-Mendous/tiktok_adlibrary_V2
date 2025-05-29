@@ -4,7 +4,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import base64
 from utilities.logger import logger
-
+ 
 
 load_dotenv()
 api_key = os.getenv('GOOGLE_API_KEY')
@@ -36,10 +36,6 @@ def gemini_20_flash_with_video(prompt, uploaded_file):
     )
 
     return response.text
-
-# def upload_video(video_path):
-#     uploaded_file = genai.upload_file(video_path, mime_type="video/mp4")
-#     return uploaded_file
 
 def upload_video(video_path: str, timeout_count=10) -> genai.types.File:
     uploaded_file = genai.upload_file(video_path, mime_type="video/mp4")
