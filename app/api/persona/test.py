@@ -26,6 +26,5 @@ payload = {
 
 response = requests.post(url, json=payload)
 
-# 出力
 print("Status Code:", response.status_code)
 print("Response JSON:", response.json())

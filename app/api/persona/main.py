@@ -110,5 +110,5 @@ def convert_to_dict(response):
 
 #activate fastapi
 """
-uvicorn app.api.persona.main:app --reload
+uvicorn app.api.persona.main:app --host 0.0.0.0 --port 8000
 """
