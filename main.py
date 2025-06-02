@@ -73,11 +73,16 @@ elif system_num == 3:
         dict_list = select_from_supabase(table_name, "system_status", "indivisual_scraping")
         supabase = spabase_supabase()
         for dict_dict in dict_list:
+            usable = dict_dict["system_usable"]
             id = dict_dict["system_id"]
             url = dict_dict["search_url"]
 
+            if not usable:
+                logger.info(f"Skipping video research for {id} because its a unusable data")
+                continue
+
             from app.analysing.video.logic import run_flow
-            output = run_flow(url)
+            output = run_flow(url, id)
 
             supabase.table(table_name).update(output).eq("system_id", id).execute()
             logger.info(f"Successfully updated: {id}")
@@ -103,15 +108,19 @@ elif system_num == 4:
                 logger.critical(f"🔴 {e}")
                 continue
 
+            if not indivisual_output["system_usable"]:
+                logger.info(f"Skipping video research for {id} because its a unusable data")
+                continue
+
             try:
                 from app.analysing.video.logic import run_flow
-                video_output = run_flow(url)
+                video_output = run_flow(url, id)
                 supabase.table(table_name).update(video_output).eq("system_id", id).execute()
                 logger.info(f"Successfully updated - video: {id}")
             except Exception as e:
                 logger.critical(f"🔴 {e}")
                 continue
-            
+
     except Exception as e:
         logger.critical(f"🔴 {e}")
         traceback.print_exc()

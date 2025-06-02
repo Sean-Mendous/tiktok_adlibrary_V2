@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.llm.chatgpt_setting import chatgpt_4omini
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 # CORSを許可
 app.add_middleware(
@@ -77,14 +77,30 @@ class PromptRequest(BaseModel):
 @app.post("/persona")
 def persona_api(req: PromptRequest):
     try:
-        prompt = create_prompt(req.input)
-        result = chatgpt_4omini(prompt)
-        converted_result = convert_to_dict(result)
+        result = run_flow(req.input)
     except Exception as e:
         return JSONResponse(status_code=400, content={"success": False, "error": str(e)})
 
-    return JSONResponse(status_code=200, content={"success": True, "data": converted_result})
+    return JSONResponse(status_code=200, content={"success": True, "data": result})
 
+def run_flow(input: str):
+    try:
+        prompt = create_prompt(input)
+    except Exception as e:
+        raise Exception(f"Error to create prompt: {e}")
+    
+    try:
+        result = chatgpt_4omini(prompt)
+    except Exception as e:
+        raise Exception(f"Error to ask: {e}")
+    
+    try:
+        converted_result = convert_to_dict(result)
+    except Exception as e:
+        raise Exception(f"Error to convert: {e}")
+    
+    return converted_result
+    
 def create_prompt(input: str):
     try:
         with open("app/api/persona/prompt.md", "r") as f:

@@ -24,15 +24,18 @@ def request_video(url, output_path):
     headers = {
         "User-Agent": "Mozilla/5.0"
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, stream=True)
     if response.status_code == 200:
         logger.info(f" - success to get response")
         with open(output_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024*1024):
                 if chunk:
                     f.write(chunk)
-                    logger.info(f" - success to write video")
-                    return output_path
+        logger.info(f" - success to write entire video")
+        return output_path
+    else:
+        logger.warning(f" - failed to get video (status: {response.status_code})")
+        return None
 
 def cleanup_videofile(video_path):
     input_path = video_path
@@ -128,6 +131,8 @@ def download(url, output_path):
         logger.info(f" >Getting file size..")
         file_size = get_file_size(cleaned_output_path)
         logger.info(f" >Successfully got file size ({file_size['megabytes']} MB)")
+        if file_size['megabytes'] > 19:
+            raise RuntimeError(f"Video file size is too large (size: {file_size['megabytes']} MB)")
     except Exception as e:
         raise RuntimeError(f"Failed to get file size: {e}") from e
 

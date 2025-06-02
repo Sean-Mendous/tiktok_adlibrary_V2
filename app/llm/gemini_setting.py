@@ -47,9 +47,9 @@ def upload_video(video_path: str, timeout_count=10) -> genai.types.File:
         if file.state.name == "ACTIVE":
             return file
         elif file.state.name == "FAILED":
-            logger.warning(f" - file failed to upload. ({i}/{timeout_count})")
+            logger.error(f" - file failed to upload. ({i}/{timeout_count})")
         else:
-            logger.error(f" - unknown file status: {file.state.name}")
+            logger.warning(f" - unknown file status: {file.state.name}")
         time.sleep(wait_interval)
 
     raise TimeoutError(f"File {file_id} did not become ACTIVE within {timeout_count} times.")

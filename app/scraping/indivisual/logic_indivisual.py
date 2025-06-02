@@ -58,31 +58,30 @@ def run_flow(url, cookie_path=cookie_path):
     except Exception as e:
         raise RuntimeError(f'Failed to convert data: {e}') from e
     
-    return converted_data
-
-def to_db(table_name="V2_format", amount=10000):
-    supabase = spabase_supabase()
-    rows = supabase.table(table_name).select("*").eq("system_status", "list_scraping").execute().data
-    logger.info(f'Successfully got rows: {len(rows)}')
-
-    for i, row in enumerate(rows, start=1):
-        if i < amount:
-            logger.info(f'{i}/{len(rows)}: Start to run flow')
-            url = row["search_url"]
-            id = row["system_id"]
-
-            data = run_flow(url)
-
-            status = "indivisual_scraping"
-            data["system_status"] = status
-            logger.info(f'Successfully extracted data:\n{data}')
-            supabase.table(table_name).update(data).eq("system_id", id).execute()
-            logger.info(f'{i+1}/{len(rows)}: Successfully ran flow')
+    try:
+        system_usable = usable_data(converted_data)
+        if system_usable == False or system_usable == True:
+            logger.info(f'Successfully checked usable data ({system_usable})')
         else:
-            logger.info(f'Finished all rows')
-            break
+            raise RuntimeError(f'Failed to check usable data')
+        overall_data = converted_data | {"system_usable": system_usable}
+    except Exception as e:
+        raise RuntimeError(f'Failed to check usable data: {e}') from e
     
-    logger.info(f'Successfully ran flow for all rows')
+    return overall_data
+
+def usable_data(converted_data):
+    if not converted_data["scraping_landingpage"]:
+        return False
+    if converted_data["scraping_budget"] == "Low":
+        return False
+    if converted_data["scraping_ctr_top"] == 99 or converted_data["scraping_ctr_sec"] == "99":
+        return False
+    if converted_data["scraping_cvr_top"] == 99 or converted_data["scraping_cvr_sec"] == "99":
+        return False
+    
+    return True
+
 
 if __name__ == "__main__":
     to_db(amount=5)
