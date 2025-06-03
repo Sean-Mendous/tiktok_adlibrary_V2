@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.api.persona.logic import run_flow
 
-app = FastAPI(root_path="/api/persona")
+app = FastAPI()
 
 # CORSを許可
 app.add_middleware(

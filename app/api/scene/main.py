@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.api.scene.logic import run_flow
 
-app = FastAPI(root_path="/api/scene")
+app = FastAPI()
 
 # CORSを許可
 app.add_middleware(
