@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from app.api.scene.logic import run_flow
 
-app = FastAPI(root_path="/api")
+app = FastAPI(root_path="/api/scene")
 
 # CORSを許可
 app.add_middleware(
@@ -27,11 +27,7 @@ def scene_api(req: PromptRequest):
 
     return JSONResponse(status_code=200, content={"success": True, "data": result})
 
-"""
-python -m app.api.scene.main
-"""
-
 #activate fastapi
 """
-uvicorn app.api.scene.main:app --host 0.0.0.0 --port 8000
+uvicorn app.api.scene.main:app --host 0.0.0.0 --port 8001
 """
