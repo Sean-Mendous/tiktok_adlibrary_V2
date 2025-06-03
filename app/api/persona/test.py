@@ -18,9 +18,6 @@ payload = {
         },
         "marketing_info": {
             "cost": "2500円",
-
-
-
             "campaing": "今なら10%割引",
             "apeals": "満足度No.1",
         }
