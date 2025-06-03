@@ -18,7 +18,7 @@ app.add_middleware(
 class PromptRequest(BaseModel):
     input: dict
 
-@app.post("/scene")
+@app.post("/")
 def scene_api(req: PromptRequest):
     try:
         result = run_flow(req.input)

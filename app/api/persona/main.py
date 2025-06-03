@@ -18,7 +18,7 @@ app.add_middleware(
 class PromptRequest(BaseModel):
     input: dict
 
-@app.post("/persona")
+@app.post("/")
 def persona_api(req: PromptRequest):
     try:
         result = run_flow(req.input)
