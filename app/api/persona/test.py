@@ -1,6 +1,6 @@
 import requests
 
-url = "http://133.125.60.141:8000/persona"
+url = "https://clip-studio.tokyo/api/persona"
 
 payload = {
     "input": {
@@ -18,6 +18,9 @@ payload = {
         },
         "marketing_info": {
             "cost": "2500円",
+
+
+
             "campaing": "今なら10%割引",
             "apeals": "満足度No.1",
         }
