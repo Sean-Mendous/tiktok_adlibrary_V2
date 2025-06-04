@@ -7,7 +7,8 @@ from app.api.scene.logic import run_flow
 app = FastAPI(
     docs_url="/docs",
     redoc_url=None,
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    root_path="/api/scene"
 )
 
 # CORSを許可

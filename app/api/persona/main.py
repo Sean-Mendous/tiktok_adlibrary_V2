@@ -7,7 +7,8 @@ from app.api.persona.logic import run_flow
 app = FastAPI(
     docs_url="/docs",
     redoc_url=None,
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    root_path="/api/persona"
 )
 
 # CORSを許可
