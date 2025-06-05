@@ -75,8 +75,8 @@ from app.llm.gemini_setting import upload_video, gemini_20_flash_with_video
 """
 
 def run_flow(input: str):
-    video_url = input["video_url"]
-    client_input = input["client_input"]
+    video_url = input["input"]["video_url"]
+    client_input = input["input"]["client_input"]
 
     try:
         prompt_01 = create_prompt_01(client_input)
