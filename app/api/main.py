@@ -2,7 +2,6 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from app.api.scene.logic import run_flow
 
 app = FastAPI(
     docs_url="/docs",
@@ -41,6 +40,12 @@ def scene_api(req: PromptRequest):
 
     return JSONResponse(status_code=200, content={"success": True, "data": result})
 
-#activate fastapi
+#ngrok
 """
+ngrok http 8000
+"""
+
+#activate
+"""
+uvicorn app.api.main:app --host 0.0.0.0 --port 8000
 """

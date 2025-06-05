@@ -1,77 +1,15 @@
 import re
 import json
 import os
+import time
+import requests
 from app.llm.chatgpt_setting import chatgpt_4o
+from app.llm.gemini_setting import upload_video, gemini_20_flash_with_video
 
 #input
 """
 "input": {
-    "video_content_structure": [
-        {
-            "start_sec": "0",
-            "end_sec": "1",
-            "structure": "hook",
-            "summary": "動画の冒頭では、女性が夜食を食べた影響で顔のコンディションが悪いと訴えており、この状況に視聴者が共感しやすいようなフックを設定しています。初めの数秒での表情や言葉がインパクトを持ち、視聴者の注意を引きつける役割を果たしています。",
-            "what": [
-                "顔のコンディションが悪い",
-                "夜食の影響",
-                "共感を誘う表情"
-            ],
-            "how": [
-                "自撮り映像を使用",
-                "鏡の前での動作",
-                "感情的なセリフ"
-            ]
-        },
-        {
-            "start_sec": "2",
-            "end_sec": "2",
-            "structure": "problem",
-            "summary": "女性が顔の悩みを抱える姿を見せた後、そんな時の対処法があることを提示しています。視聴者に「これは自分の悩みでもある」と感じさせることで、共感をさらに深め、問題提起の段階に進んでいます。",
-            "what": [
-                "顔のコンディション",
-                "悩みの存在",
-                "対処法の提示"
-            ],
-            "how": [
-                "商品を映し出す",
-                "視覚的なインパクト",
-                "ナレーションで解決策の存在を示唆"
-            ]
-        },
-        {
-            "start_sec": "3",
-            "end_sec": "14",
-            "structure": "solve",
-            "summary": "YA-MANの美顔器と美容液のセットが紹介され、具体的な商品の機能と効果が説明されます。視聴者に対して「この商品を使うことであなたの悩みが解決できる」とシンプルに伝え、信頼を高める内容になっています。",
-            "what": [
-                "YA-MANの美顔器",
-                "美容液",
-                "効果的なスキンケア"
-            ],
-            "how": [
-                "商品の詳細を示す映像",
-                "使用方法やビフォーアフターを提示",
-                "体験談のような語り口"
-            ]
-        },
-        {
-            "start_sec": "15",
-            "end_sec": "30",
-            "structure": "cta",
-            "summary": "最後に、軽快な口調で美顔器の使い方とその効果を紹介し、視聴者に対して試すことを促します。特に「肌がうるおったこと」や「メイクのりが良い」と具体的な効果を示すことで、行動を促す強いメッセージを伝えています。",
-            "what": [
-                "美顔器の使用方法",
-                "メイクのりの向上",
-                "試すことの推奨"
-            ],
-            "how": [
-                "感情を高める言葉の使用",
-                "具体的な効果を示す",
-                "視聴者に行動を促す"
-            ]
-        }
-    ],
+    "video_url": ""
     "client_input": {
         "basic": {
             "target_info": {
@@ -137,33 +75,69 @@ from app.llm.chatgpt_setting import chatgpt_4o
 """
 
 def run_flow(input: str):
-    video_content_structure = json.dumps(input["video_content_structure"], indent=4, ensure_ascii=False)
-    client_input = json.dumps(input["client_input"], indent=4, ensure_ascii=False)
+    video_url = input["video_url"]
+    client_input = input["client_input"]
 
     try:
-        prompt = create_prompt(video_content_structure, client_input)
+        prompt_01 = create_prompt_01(client_input)
     except Exception as e:
         raise Exception(f"Error to create prompt: {e}")
     
-    # print(prompt)
+    try:
+        video_path = request_video(video_url, "app/api/scene/video.mp4")
+    except Exception as e:
+        raise Exception(f"Error downloading video: {e}")
+
+    # video_path = "app/api/scene/video.mp4"
     
     try:
-        result = chatgpt_4o(prompt)
+        uploaded_file = upload_video(video_path)
+    except Exception as e:
+        raise Exception(f"Error to upload video: {e}")
+    finally:
+        if os.path.exists(video_path):
+            os.remove(video_path)
+    
+    try:
+        free_format_responce = gemini_20_flash_with_video(prompt_01, uploaded_file)
     except Exception as e:
         raise Exception(f"Error to ask: {e}")
     
+    print(free_format_responce)
+    
     try:
-        converted_result = convert_to_dict(result)
+        prompt_02 = create_prompt_02(free_format_responce)
+    except Exception as e:
+        raise Exception(f"Error to create prompt: {e}")
+    
+    try:
+        json_format_responce = chatgpt_4o(prompt_02)
+    except Exception as e:
+        raise Exception(f"Error to ask: {e}")
+    
+    print(json_format_responce)
+    
+    try:
+        converted_result = convert_to_dict(json_format_responce)
     except Exception as e:
         raise Exception(f"Error to convert: {e}")
     
     return converted_result
 
-def create_prompt(video_content_structure, client_input):
+def create_prompt_01(client_input):
     try:
-        with open("app/api/scene/prompt.md", "r") as f:
+        with open("app/api/scene/01_prompt.md", "r") as f:
             base_prompt = f.read()
-        overall_prompt = f"{base_prompt}\n# video_content_structure\n{video_content_structure}\n\n\n# client_input\n{client_input}"
+        overall_prompt = f"{base_prompt}{client_input}"
+        return overall_prompt
+    except Exception as e:
+        raise Exception(f"Error to create prompt: {e}")
+    
+def create_prompt_02(free_input):
+    try:
+        with open("app/api/scene/02_prompt.md", "r") as f:
+            base_prompt = f.read()
+        overall_prompt = f"{base_prompt}{free_input}"
         return overall_prompt
     except Exception as e:
         raise Exception(f"Error to create prompt: {e}")
@@ -181,6 +155,20 @@ def convert_to_dict(response):
     except Exception as e:
         raise Exception(f"Error to convert to dict: {e}")
 
+def request_video(url, output_path):
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+    response = requests.get(url, headers=headers, stream=True)
+    if response.status_code == 200:
+        with open(output_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024*1024):
+                if chunk:
+                    f.write(chunk)
+        return output_path
+    else:
+        return None
+
 if __name__ == "__main__":
     input_path = "app/api/scene/test/input.json"
     with open(input_path, 'r', encoding='utf-8') as f:
@@ -193,3 +181,7 @@ if __name__ == "__main__":
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, indent=4, ensure_ascii=False)
     print('All Done!')
+
+"""
+python -m app.api.scene.logic
+"""

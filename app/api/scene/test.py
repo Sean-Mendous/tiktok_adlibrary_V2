@@ -1,7 +1,7 @@
 import json
 import requests
 
-url = "https://clip-studio.tokyo/api/scene"
+url = "https://7223-133-125-60-141.ngrok-free.app/scene"
 
 payload = {
     "input": {

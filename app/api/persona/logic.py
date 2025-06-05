@@ -12,6 +12,7 @@ from app.llm.chatgpt_setting import chatgpt_4omini
    "issue": ""
  },
  "product_info": {
+   "name": "",
    "category": "",
    "strength": "",
    "competition": "",
