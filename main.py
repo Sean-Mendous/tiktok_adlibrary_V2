@@ -17,14 +17,13 @@ search_feild = [
 
 table_name = "V2_format"
 
-system_num = input("""
+system_num = 4
+"""
 1: list scraping
 2: indivisual scraping
 3: video research
 4: indivisual scraping + video research
-                   
-Enter the system number.. 
-""")
+"""
 system_num = int(system_num)
 
 logger.info("Running system")
@@ -38,7 +37,7 @@ if system_num == 1:
             from app.scraping.list.logic_list import run_flow
             output = run_flow(url, condition)
 
-            supabase.table(table_name).insert(output).execute()
+            supabase.table(table_name).upsert(output).execute()
             logger.info(f"Successfully inserted: {url}")
     except Exception as e:
         logger.critical(f"🔴 {e}")
@@ -76,6 +75,8 @@ elif system_num == 3:
             usable = dict_dict["system_usable"]
             id = dict_dict["system_id"]
             url = dict_dict["search_url"]
+
+            logger.info(f"Processing {dict_dict['system_id']}")
 
             if not usable:
                 logger.info(f"Skipping video research for {id} because its a unusable data")

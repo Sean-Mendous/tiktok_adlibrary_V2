@@ -64,13 +64,13 @@ def run_flow(url, id, erase=True):
     print(uploaded_file)
 
     try:
-        second_responce_dict, structure_responce_dict = basic_flow(uploaded_file)
+        basic_responce_dict = basic_flow(uploaded_file)
     except Exception as e:
         raise Exception(f"Error to ask: {e}")
 
     try:
         logger.info(f"Converting data...")
-        all_respoinces = second_responce_dict | structure_responce_dict
+        all_respoinces = basic_responce_dict
         def convert_data(dict):
             converted_data = dict | {"system_status": "video_analysis", "video_url": video_url}
             return converted_data
@@ -84,29 +84,29 @@ def run_flow(url, id, erase=True):
     return converted_data
 
 def basic_flow(uploaded_file):
-    # try:
-    #     logger.info('Asking by video.. (basic)')
-    #     prompt_path = "app/analysing/video/prompt/basic_prompt.md"
-    #     basic_responce_dict = gemini_20_flash_video(prompt_path, uploaded_file)
-    #     if not basic_responce_dict:
-    #         raise Exception("Failed to ask")
-    #     logger.info(f"Asked successfully")
-    # except Exception as e:
-    #     raise Exception(f"Error to ask: {e}")
-    
-    # print(json.dumps(basic_responce_dict, indent=4, ensure_ascii=False))
-
     try:
-        logger.info('Asking by video.. (second)')
-        prompt_path = "app/analysing/video/prompt/second_prompt.md"
-        second_responce_dict = gemini_20_flash_video(prompt_path, uploaded_file)
-        if not second_responce_dict:
+        logger.info('Asking by video.. (basic)')
+        prompt_path = "app/analysing/video/prompt/basic_prompt.md"
+        basic_responce_dict = gemini_20_flash_video(prompt_path, uploaded_file)
+        if not basic_responce_dict:
             raise Exception("Failed to ask")
         logger.info(f"Asked successfully")
     except Exception as e:
         raise Exception(f"Error to ask: {e}")
     
-    print(json.dumps(second_responce_dict, indent=4, ensure_ascii=False))
+    print(json.dumps(basic_responce_dict, indent=4, ensure_ascii=False))
+
+    # try:
+    #     logger.info('Asking by video.. (second)')
+    #     prompt_path = "app/analysing/video/prompt/second_prompt.md"
+    #     second_responce_dict = gemini_20_flash_video(prompt_path, uploaded_file)
+    #     if not second_responce_dict:
+    #         raise Exception("Failed to ask")
+    #     logger.info(f"Asked successfully")
+    # except Exception as e:
+    #     raise Exception(f"Error to ask: {e}")
+    
+    # print(json.dumps(second_responce_dict, indent=4, ensure_ascii=False))
 
     # try:
     #     logger.info('Asking by text.. (scene)')
@@ -119,20 +119,20 @@ def basic_flow(uploaded_file):
     # except Exception as e:
     #     raise Exception(f"Error to ask: {e}")
     
-    try:
-        logger.info('Asking by text.. (structure)')
-        prompt_path = "app/analysing/video/prompt/structure_prompt.md"
-        second_responce_json = json.dumps(second_responce_dict, indent=4, ensure_ascii=False)
-        structure_responce_dict = chatgpt_4o_mini_text(prompt_path, other_input=second_responce_json)
-        if not structure_responce_dict:
-            raise Exception("Failed to ask")
-        logger.info(f"Asked successfully")
-    except Exception as e:
-        raise Exception(f"Error to ask: {e}")
+    # try:
+    #     logger.info('Asking by text.. (structure)')
+    #     prompt_path = "app/analysing/video/prompt/structure_prompt.md"
+    #     second_responce_json = json.dumps(second_responce_dict, indent=4, ensure_ascii=False)
+    #     structure_responce_dict = chatgpt_4o_mini_text(prompt_path, other_input=second_responce_json)
+    #     if not structure_responce_dict:
+    #         raise Exception("Failed to ask")
+    #     logger.info(f"Asked successfully")
+    # except Exception as e:
+    #     raise Exception(f"Error to ask: {e}")
     
-    print(json.dumps(structure_responce_dict, indent=4, ensure_ascii=False))
+    # print(json.dumps(structure_responce_dict, indent=4, ensure_ascii=False))
 
-    return second_responce_dict, structure_responce_dict
+    return basic_responce_dict
 
 def upload_video_to_cloudinary(video_path):
     try:

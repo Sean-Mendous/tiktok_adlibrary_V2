@@ -49,8 +49,10 @@ def run_flow(url, condition, cookie_path=cookie_path):
         }
 
         datas.append(data)
+
+    fixed_datas = list({item["system_id"]: item for item in datas}.values())
     
-    return datas
+    return fixed_datas
 
 def to_db(dict_list, table_name="V2_format"):
     logger.info(f'Start to insert data to supabase: {len(dict_list)} urls')

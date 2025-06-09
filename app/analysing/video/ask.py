@@ -14,8 +14,6 @@ def gemini_20_flash_video(prompt_path, uploaded_file):
             logger.info(f" >Successfully read markdown file")
     except Exception as e:
         raise RuntimeError(f"Failed to read markdown file: {e}") from e
-    
-    print(prompt)
 
     try:
         logger.info(f" >Asking the prompts..")
@@ -52,8 +50,6 @@ def chatgpt_4o_mini_text(prompt_path, other_input):
         overall_prompt = prompt + "\n" + other_input
     else:
         overall_prompt = prompt
-
-    print(overall_prompt)
 
     try:
         logger.info(f" >Asking the prompts..")
