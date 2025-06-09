@@ -1,7 +1,7 @@
 # Basic Settings
 
 ## Base Url
-https://0719-133-125-60-141.ngrok-free.app/
+https://1f0f-133-125-60-141.ngrok-free.app/
 
 --------------------
 
